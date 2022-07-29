@@ -1,3 +1,6 @@
+# 1 "/var/folders/q9/yq4yhzcx5jj1rh1dhhfztph80000gn/T/tmpw58eg1ob"
+#include <Arduino.h>
+# 1 "/Users/timolohmann/Documents/PlatformIO/Projects/Camper-tracker/src/camper-tracker.ino"
 
 #include <Arduino.h>
 #include <SoftWire.h>
@@ -11,7 +14,7 @@
 
 #define SEALEVELPRESSURE_HPA (1019)
 
-Adafruit_BME280 bme; // I2C
+Adafruit_BME280 bme;
 
 #define PIN_SDA 4
 #define PIN_SCL 15
@@ -26,14 +29,19 @@ const char *ssid = "HATILAN";
 const char *password = "1Qayxsw2";
 const char *serverName = "http://rudi.timolohmann.de/logs";
 unsigned long delayTime;
-
+void setup();
+void loop();
+void printOnDisplay(String tmp, String hum, String lon, String lat, String alt, String speed);
+void sendToServer(String tmp, String hum, String lon, String lat, String alt, String speed, String sat);
+void printInSerial(String temperature, String humidity, String longitude, String latitude, String altitude, String speed);
+#line 30 "/Users/timolohmann/Documents/PlatformIO/Projects/Camper-tracker/src/camper-tracker.ino"
 void setup()
 {
   Serial.begin(115200);
   Serial.setDebugOutput(true);
 
   pinMode(16, OUTPUT);
-  digitalWrite(16, LOW); // set GPIO16 low to reset OLED
+  digitalWrite(16, LOW);
   delay(50);
   digitalWrite(16, HIGH);
   delay(50);
@@ -73,9 +81,9 @@ void setup()
   delayTime = 30000;
 
   bme.setSampling(Adafruit_BME280::MODE_FORCED,
-                  Adafruit_BME280::SAMPLING_X16, // temperature
-                  Adafruit_BME280::SAMPLING_X1,  // pressure
-                  Adafruit_BME280::SAMPLING_X1,  // humidity
+                  Adafruit_BME280::SAMPLING_X16,
+                  Adafruit_BME280::SAMPLING_X1,
+                  Adafruit_BME280::SAMPLING_X1,
                   Adafruit_BME280::FILTER_X16,
                   Adafruit_BME280::STANDBY_MS_0_5);
 }
@@ -98,7 +106,7 @@ void loop()
   String speed = String(gps.speed.kmph());
   String satellites = String(gps.satellites.value());
 
-  display.clear(); // clear display buffer
+  display.clear();
   printOnDisplay(temperature, humidity, longitude, latitude, altitude, speed);
   printInSerial(temperature, humidity, longitude, latitude, altitude, speed);
   sendToServer(temperature, humidity, longitude, latitude, altitude, speed, satellites);
