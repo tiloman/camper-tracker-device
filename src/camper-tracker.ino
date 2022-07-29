@@ -4,7 +4,7 @@
 #include "SSD1306.h"
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
-#include <WiFi.h>
+#include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
 #include <HTTPClient.h>
 #include <TinyGPS++.h>
 #include <HardwareSerial.h>
@@ -22,16 +22,17 @@ SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
 TinyGPSPlus gps;
 HardwareSerial SerialGPS(1);
 
-const char *ssid = "HATILAN";
-const char *password = "1Qayxsw2";
 const char *serverName = "http://rudi.timolohmann.de/logs";
 unsigned long delayTime;
 
 void setup()
 {
+  WiFi.mode(WIFI_STA);
+
   Serial.begin(115200);
   Serial.setDebugOutput(true);
 
+  //DISPLAY
   pinMode(16, OUTPUT);
   digitalWrite(16, LOW); // set GPIO16 low to reset OLED
   delay(50);
@@ -45,6 +46,30 @@ void setup()
   display.display();
   delay(500);
 
+  //WiFi Manager Setup
+  WiFiManager wm;
+  wm.setConfigPortalTimeout(180);
+  wm.setAPCallback(configModeCallback);
+  bool res;
+  res = wm.autoConnect("ESP32", "secretpassword"); // password protected ap
+
+  if (!res)
+  {
+    display.clear();
+    display.drawString(0, 0, "WIFI: Failed to connect.");
+    display.display();
+    Serial.println("WIFI: Failed to connect.");
+  }
+  else
+  {
+    display.clear();
+    display.drawString(0, 0, "WIFI: Success :)");
+    display.display();
+    Serial.println("WIFI: Success");
+  }
+
+
+  //TEMP SENSOR
   bool bme_status;
   bme_status = bme.begin(0x76);
   if (!bme_status)
@@ -56,28 +81,19 @@ void setup()
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
   }
 
-  WiFi.begin(ssid, password);
-  Serial.println("Connecting");
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.print("Connected to WiFi network with IP Address: ");
-  Serial.println(WiFi.localIP());
-
-  SerialGPS.begin(9600, SERIAL_8N1, 22, 23);
-  delay(500);
-
-  delayTime = 30000;
-
   bme.setSampling(Adafruit_BME280::MODE_FORCED,
                   Adafruit_BME280::SAMPLING_X16, // temperature
                   Adafruit_BME280::SAMPLING_X1,  // pressure
                   Adafruit_BME280::SAMPLING_X1,  // humidity
                   Adafruit_BME280::FILTER_X16,
                   Adafruit_BME280::STANDBY_MS_0_5);
+
+  //GPS SENSOR
+  SerialGPS.begin(9600, SERIAL_8N1, 22, 23);
+  delay(500);
+
+  //LOOP TIME
+  delayTime = 30000;
 }
 
 void loop()
@@ -174,4 +190,12 @@ void printInSerial(String temperature, String humidity, String longitude, String
   Serial.println(temperature);
   Serial.print("Humidity: ");
   Serial.println(humidity);
+}
+
+void configModeCallback(WiFiManager *wm)
+{
+  display.clear();
+  display.drawString(0, 0, "Connect any device to ESP32");
+  display.drawString(0, 10, "to setup WiFi connection");
+  display.display();
 }
