@@ -4,6 +4,7 @@ GPS and temperature tracker for camper (or car) tracking.
 ## Features
 - Display Sensor Data on OLED Screen
 - Send data continously to Server via HTTP POST
+- Access any WiFi via WiFi Manager (https://github.com/khoih-prog/ESP_WiFiManager)
 
 ## Hardware
 - Heltec Wifi32 Lora V2 Board with OLED Display
