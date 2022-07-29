@@ -18,5 +18,5 @@ GPS and temperature tracker for camper (or car) tracking.
 ![Board](IMG_3104.jpeg)
 
 ## Pinout Diagram
-![Pinout diagram](WiFi_LoRa_32_V2.jpg)
+![Pinout diagram](WIFI_LoRa_32_V2.jpg)
 
