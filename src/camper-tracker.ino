@@ -191,3 +191,11 @@ void printInSerial(String temperature, String humidity, String longitude, String
   Serial.print("Humidity: ");
   Serial.println(humidity);
 }
+
+void configModeCallback(WiFiManager *wm)
+{
+  display.clear();
+  display.drawString(0, 0, "Connect any device to ESP32");
+  display.drawString(0, 10, "to setup WiFi connection");
+  display.display();
+}
